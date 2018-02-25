@@ -68,12 +68,12 @@ public class Hand : MonoBehaviour {
 
 		if (OVRInput.GetDown(OVRInput.Button.One)) {
 			minY = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch).y;
-			maxX = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch).x;
+			maxX = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch).z;
 		}
 
 		if (OVRInput.GetDown (OVRInput.Button.Two)) {
 			maxY = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch).y;
-			minX = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch).x;
+			minX = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch).z;
 		}
 
 		updateCurrentPosition();
@@ -115,7 +115,7 @@ public class Hand : MonoBehaviour {
 
 		// Send across socket connection
 		if (delay < 0) {
-			w.SendString(Mathf.Abs(pos.z) + "," + Mathf.Abs(pos.y));
+			w.SendString(newPos.x + "," + newPos.y);
 			delay = 500F;
 		}
 
