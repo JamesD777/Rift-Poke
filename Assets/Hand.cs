@@ -43,7 +43,6 @@ public class Hand : MonoBehaviour {
                 {
                     Object.DestroyImmediate(mTempJoint);
                     mTempJoint = null;
-                    throwObject();
                     mHandState = State.EMPTY;
                 }
                 mOldVelocity = OVRInput.GetLocalControllerAngularVelocity(Controller);
@@ -74,15 +73,5 @@ public class Hand : MonoBehaviour {
                 mHandState = State.EMPTY;
             }
         }
-    }
-
-    private void throwObject()
-    {
-        mHeldObject.velocity = OVRInput.GetLocalControllerVelocity(Controller);
-        if (mOldVelocity != null)
-        {
-            mHeldObject.angularVelocity = OVRInput.GetLocalControllerAngularVelocity(Controller);
-        }
-        mHeldObject.maxAngularVelocity = mHeldObject.angularVelocity.magnitude;
     }
 }
