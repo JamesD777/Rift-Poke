@@ -76,6 +76,11 @@ public class Hand : MonoBehaviour {
 			minX = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch).z;
 		}
 
+		float thumbstick = OVRInput.Get (OVRInput.Axis2D.PrimaryThumbstick).y;
+		if (Mathf.Abs(thumbstick) > 0) {
+			w.SendString (thumbstick > 0 ? "U" : "P");
+		}
+
 		updateCurrentPosition();
 	}
 
