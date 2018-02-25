@@ -26,6 +26,17 @@ public class Hand : MonoBehaviour {
 
 	IEnumerator startSocket() {
 		yield return StartCoroutine(w.Connect());
+		while (true)
+		{
+			string message = w.RecvString();
+			if (message == "arduino") {
+				Debug.Log (message);
+				startPosition = currentPosition;
+				currentPosition = new Vector2 (0, 0);
+			}
+			yield return 0;
+		}
+		w.Close ();
 	}
 
 	// Use this for initialization
@@ -104,9 +115,6 @@ public class Hand : MonoBehaviour {
 
 		Vector3 pos = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch);
 
-		Debug.Log (startPosition);
-
-
 		// Send across socket connection
 		currentPosition.x = Mathf.Abs(pos.z - startPosition.x);
 		currentPosition.y = Mathf.Abs(pos.y - startPosition.y);
@@ -117,7 +125,6 @@ public class Hand : MonoBehaviour {
 		}
 
 		delay -= Time.deltaTime * 1000;
-		Debug.Log (currentPosition);
 	}
 
 	private void throwObject()
