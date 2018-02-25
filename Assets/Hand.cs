@@ -113,6 +113,19 @@ public class Hand : MonoBehaviour {
 
 		Debug.Log ("Raw: " + pos + " Scaled: " + newPos);
 
+		if (pos.z < minX) {
+			Debug.Log ("TOO FAR BACK");
+		}
+		if (pos.z > maxX) {
+			Debug.Log ("TOO FAR FORWARD");
+		}
+		if (pos.y < minY) {
+			Debug.Log ("TOO FAR DOWN");
+		}
+		if (pos.y > maxY) {
+			Debug.Log ("TOO FAR UP");
+		}
+
 		// Send across socket connection
 		if (delay < 0) {
 			w.SendString(newPos.x + "," + newPos.y);
