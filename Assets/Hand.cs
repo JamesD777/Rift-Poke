@@ -10,11 +10,11 @@ public class Hand : MonoBehaviour {
 		HOLDING
 	};
 
-	public Vector2 startPosition;
-	public Vector2 currentPosition = new Vector2();
 	float delay = 500F;
-
 	WebSocket w = new WebSocket(new System.Uri("ws://localhost:8080"));
+
+	float minY = 0;
+	float maxY = 0;
 
 	public OVRInput.Controller Controller = OVRInput.Controller.LTouch;
 	public State mHandState = State.EMPTY;
@@ -24,19 +24,10 @@ public class Hand : MonoBehaviour {
 	private FixedJoint mTempJoint;
 	private Vector3 mOldVelocity;
 
+	bool received = false;
+
 	IEnumerator startSocket() {
 		yield return StartCoroutine(w.Connect());
-		while (true)
-		{
-			string message = w.RecvString();
-			if (message == "arduino") {
-				Debug.Log (message);
-				startPosition = currentPosition;
-				currentPosition = new Vector2 (0, 0);
-			}
-			yield return 0;
-		}
-		w.Close ();
 	}
 
 	// Use this for initialization
@@ -71,6 +62,16 @@ public class Hand : MonoBehaviour {
 			}
 			mOldVelocity = OVRInput.GetLocalControllerAngularVelocity(Controller);
 			break;
+		}
+
+		if (OVRInput.GetDown(OVRInput.Button.One)) {
+			minY = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch).y;
+			Debug.Log (minY);
+		}
+
+		if (OVRInput.GetDown (OVRInput.Button.Two)) {
+			maxY = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch).y;
+			Debug.Log (maxY);
 		}
 
 		updateCurrentPosition();
@@ -108,19 +109,16 @@ public class Hand : MonoBehaviour {
 
 	void updateCurrentPosition() {
 
-		if (startPosition == null) {
-			startPosition = getStartPosition ();
-			return;
-		}
-
 		Vector3 pos = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch);
+		Vector2 newPos = new Vector2 ();
+		newPos.x = 0;
+		newPos.y = (pos.y - minY) * (0.43F / Mathf.Abs(maxY - minY));
+
+		Debug.Log (newPos.y);
 
 		// Send across socket connection
-		currentPosition.x = Mathf.Abs(pos.z - startPosition.x);
-		currentPosition.y = Mathf.Abs(pos.y - startPosition.y);
-
 		if (delay < 0) {
-			w.SendString(currentPosition.x + "," + currentPosition.y);
+			w.SendString(Mathf.Abs(pos.z) + "," + Mathf.Abs(pos.y));
 			delay = 500F;
 		}
 
