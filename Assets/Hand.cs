@@ -108,8 +108,8 @@ public class Hand : MonoBehaviour {
 
 
 		// Send across socket connection
-		currentPosition.x = pos.z - startPosition.x;
-		currentPosition.y = pos.y - startPosition.y;
+		currentPosition.x = Mathf.Abs(pos.z - startPosition.x);
+		currentPosition.y = Mathf.Abs(pos.y - startPosition.y);
 
 		if (delay < 0) {
 			w.SendString(currentPosition.x + "," + currentPosition.y);
