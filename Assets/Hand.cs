@@ -13,8 +13,10 @@ public class Hand : MonoBehaviour {
 	float delay = 500F;
 	WebSocket w = new WebSocket(new System.Uri("ws://localhost:8080"));
 
-	float minY = 0;
-	float maxY = 0;
+	float minX = 0.3F;
+	float maxX = 1.1F;
+	float minY = -0.88F;
+	float maxY = 0.0F;
 
 	public OVRInput.Controller Controller = OVRInput.Controller.LTouch;
 	public State mHandState = State.EMPTY;
@@ -66,12 +68,12 @@ public class Hand : MonoBehaviour {
 
 		if (OVRInput.GetDown(OVRInput.Button.One)) {
 			minY = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch).y;
-			Debug.Log (minY);
+			maxX = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch).x;
 		}
 
 		if (OVRInput.GetDown (OVRInput.Button.Two)) {
 			maxY = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch).y;
-			Debug.Log (maxY);
+			minX = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch).x;
 		}
 
 		updateCurrentPosition();
@@ -102,19 +104,14 @@ public class Hand : MonoBehaviour {
 		}
 	}
 
-	Vector2 getStartPosition() {
-		Vector3 pos = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch);
-		return new Vector2 (pos.y, pos.z);
-	}
-
 	void updateCurrentPosition() {
 
 		Vector3 pos = OVRInput.GetLocalControllerPosition (OVRInput.Controller.RTouch);
 		Vector2 newPos = new Vector2 ();
-		newPos.x = 0;
-		newPos.y = (pos.y - minY) * (0.43F / Mathf.Abs(maxY - minY));
+		newPos.x = (Mathf.Clamp(pos.z, minX, maxX) - minX) * (0.43F / Mathf.Abs (maxX - minX));
+		newPos.y = (Mathf.Clamp(pos.y, minY, maxY) - minY) * (0.43F / Mathf.Abs (maxY - minY));
 
-		Debug.Log (newPos.y);
+		Debug.Log ("Raw: " + pos + " Scaled: " + newPos);
 
 		// Send across socket connection
 		if (delay < 0) {
